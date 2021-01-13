@@ -1,13 +1,13 @@
 package com.yfwj.justauth.social.common;
 
 
+import com.alibaba.fastjson.JSONObject;
 import me.zhyd.oauth.config.AuthConfig;
 import me.zhyd.oauth.model.AuthCallback;
 import me.zhyd.oauth.model.AuthResponse;
 import me.zhyd.oauth.model.AuthUser;
 import me.zhyd.oauth.request.AuthDefaultRequest;
 import me.zhyd.oauth.request.AuthRequest;
-import me.zhyd.oauth.request.AuthWeChatEnterpriseRequest;
 import org.keycloak.broker.oidc.AbstractOAuth2IdentityProvider;
 import org.keycloak.broker.provider.AuthenticationRequest;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
@@ -51,13 +51,13 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
 
   @Override
   protected UriBuilder createAuthorizationUrl(AuthenticationRequest request) {
-    String redirectUri =  request.getRedirectUri();
-    AuthRequest authRequest = getAuthRequest(AUTH_CONFIG,redirectUri);
+    String redirectUri = request.getRedirectUri();
+    AuthRequest authRequest = getAuthRequest(AUTH_CONFIG, redirectUri);
     String uri = authRequest.authorize(request.getState().getEncoded());
     return UriBuilder.fromUri(uri);
   }
 
-  private AuthRequest getAuthRequest(AuthConfig authConfig, String redirectUri){
+  private AuthRequest getAuthRequest(AuthConfig authConfig, String redirectUri) {
     AuthRequest authRequest = null;
     authConfig.setRedirectUri(redirectUri);
     try {
@@ -106,16 +106,17 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
       AuthCallback authCallback = AuthCallback.builder().code(authorizationCode).state(state).build();
 
       // 没有check 不通过
-      String redirectUri =  "https://www.yfwj.com";
-      AuthRequest  authRequest = getAuthRequest(AUTH_CONFIG,redirectUri);
+      String redirectUri = "https://www.yfwj.com";
+      AuthRequest authRequest = getAuthRequest(AUTH_CONFIG, redirectUri);
       AuthResponse<AuthUser> response = authRequest.login(authCallback);
 
       if (response.ok()) {
-
         AuthUser authUser = response.getData();
         JustIdentityProviderConfig config = JustIdentityProvider.this.getConfig();
         BrokeredIdentityContext federatedIdentity = new BrokeredIdentityContext(authUser.getUuid());
-        federatedIdentity.setUserAttribute(config.getAlias(), authUser.getRawUserInfo().toJSONString());
+        authUser.getRawUserInfo().forEach((k, v) -> {
+          federatedIdentity.setUserAttribute(config.getAlias() + "-" + k, JSONObject.toJSONString(v));
+        });
         federatedIdentity.setIdpConfig(config);
         federatedIdentity.setIdp(JustIdentityProvider.this);
         federatedIdentity.setCode(state);
