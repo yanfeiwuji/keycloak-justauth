@@ -92,7 +92,8 @@ public enum JustAuthKey {
     return AuthConfig.builder();
   }
 
-  public static AuthConfig getAuthConfig(JustIdentityProviderConfig config, JustAuthKey justAuthKey) {
+  public static AuthConfig getAuthConfig(JustIdentityProviderConfig config) {
+    JustAuthKey justAuthKey = config.getJustAuthKey();
     String clientId = config.getClientId();
     String clientSecret = config.getClientSecret();
     String agentId = config.getAgentId();
@@ -119,4 +120,6 @@ public enum JustAuthKey {
   public String getName() {
     return name;
   }
+
+
 }

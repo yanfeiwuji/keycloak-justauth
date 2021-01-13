@@ -44,14 +44,12 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
   public final AuthConfig AUTH_CONFIG;
   public final Class<? extends AuthDefaultRequest> tClass;
 
-  private AuthRequest callBackAuthRequest;
 
   public JustIdentityProvider(KeycloakSession session, JustIdentityProviderConfig config) {
     super(session, config);
     JustAuthKey justAuthKey = config.getJustAuthKey();
-    AUTH_CONFIG = JustAuthKey.getAuthConfig(config, justAuthKey);
+    this.AUTH_CONFIG = JustAuthKey.getAuthConfig(config);
     this.tClass = justAuthKey.getTClass();
-
   }
 
   @Override
@@ -61,15 +59,12 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
     try {
       Constructor<? extends AuthDefaultRequest> constructor = tClass.getConstructor(AuthConfig.class);
       authRequest = constructor.newInstance(AUTH_CONFIG);
-      callBackAuthRequest = constructor.newInstance(AUTH_CONFIG);
     } catch (Exception e) {
       // can't
       logger.error(e.getMessage());
     }
 
     String uri = authRequest.authorize(request.getState().getEncoded());
-    logger.info(authRequest);
-
     return UriBuilder.fromUri(uri);
   }
 
@@ -80,7 +75,7 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
 
   @Override
   public Object callback(RealmModel realm, AuthenticationCallback callback, EventBuilder event) {
-    return new Endpoint(callback, realm, event, callBackAuthRequest);
+    return new Endpoint(callback, realm, event);
   }
 
 
@@ -95,13 +90,11 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
     @Context
     protected HttpHeaders headers;
 
-    protected AuthRequest authRequest;
 
-    public Endpoint(AuthenticationCallback callback, RealmModel realm, EventBuilder event, AuthRequest authRequest) {
+    public Endpoint(AuthenticationCallback callback, RealmModel realm, EventBuilder event) {
       this.callback = callback;
       this.realm = realm;
       this.event = event;
-      this.authRequest = authRequest;
     }
 
     @GET
@@ -109,8 +102,17 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
                                  @QueryParam("code") String authorizationCode,
                                  @QueryParam("error") String error) {
       AuthCallback authCallback = AuthCallback.builder().code(authorizationCode).state(state).build();
-      logger.info(this.authRequest+"======");
-      AuthResponse<AuthUser> response = this.authRequest.login(authCallback);
+
+      Class<? extends AuthDefaultRequest> tClass = JustIdentityProvider.this.getConfig().getJustAuthKey().getTClass();
+      AuthRequest authRequest = null;
+      try {
+        Constructor constructor = tClass.getConstructor(AuthConfig.class);
+        authRequest = (AuthRequest) constructor.newInstance(JustAuthKey.getAuthConfig(JustIdentityProvider.this.getConfig()));
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
+      AuthResponse<AuthUser> response = authRequest.login(authCallback);
       if (response.ok()) {
         AuthUser authUser = response.getData();
         JustIdentityProviderConfig config = JustIdentityProvider.this.getConfig();
