@@ -74,6 +74,7 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
   @Override
   public Object callback(RealmModel realm, AuthenticationCallback callback, EventBuilder event) {
     return new Endpoint(callback, realm, event);
+
   }
 
 
