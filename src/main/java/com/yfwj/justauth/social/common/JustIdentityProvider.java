@@ -2,6 +2,10 @@ package com.yfwj.justauth.social.common;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeCreator;
 import me.zhyd.oauth.config.AuthConfig;
 import me.zhyd.oauth.model.AuthCallback;
 import me.zhyd.oauth.model.AuthResponse;
@@ -9,6 +13,7 @@ import me.zhyd.oauth.model.AuthUser;
 import me.zhyd.oauth.request.AuthDefaultRequest;
 import me.zhyd.oauth.request.AuthRequest;
 import org.keycloak.broker.oidc.AbstractOAuth2IdentityProvider;
+import org.keycloak.broker.oidc.mappers.AbstractJsonUserAttributeMapper;
 import org.keycloak.broker.provider.AuthenticationRequest;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.broker.social.SocialIdentityProvider;
@@ -41,6 +46,8 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
   public final AuthConfig AUTH_CONFIG;
   public final Class<? extends AuthDefaultRequest> tClass;
 
+  private static final ObjectMapper objectMapper = new ObjectMapper();
+
 
   public JustIdentityProvider(KeycloakSession session, JustIdentityProviderConfig config) {
     super(session, config);
@@ -51,13 +58,13 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
 
   @Override
   protected UriBuilder createAuthorizationUrl(AuthenticationRequest request) {
-    String redirectUri = request.getRedirectUri();
-    AuthRequest authRequest = getAuthRequest(AUTH_CONFIG, redirectUri);
+    String redirectUri =  request.getRedirectUri();
+    AuthRequest authRequest = getAuthRequest(AUTH_CONFIG,redirectUri);
     String uri = authRequest.authorize(request.getState().getEncoded());
     return UriBuilder.fromUri(uri);
   }
 
-  private AuthRequest getAuthRequest(AuthConfig authConfig, String redirectUri) {
+  private AuthRequest getAuthRequest(AuthConfig authConfig, String redirectUri){
     AuthRequest authRequest = null;
     authConfig.setRedirectUri(redirectUri);
     try {
@@ -79,6 +86,8 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
   public Object callback(RealmModel realm, AuthenticationCallback callback, EventBuilder event) {
     return new Endpoint(callback, realm, event);
   }
+
+
 
 
   protected class Endpoint {
@@ -106,20 +115,31 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
       AuthCallback authCallback = AuthCallback.builder().code(authorizationCode).state(state).build();
 
       // 没有check 不通过
-      String redirectUri = "https://www.yfwj.com";
-      AuthRequest authRequest = getAuthRequest(AUTH_CONFIG, redirectUri);
+      String redirectUri =  "https://www.yfwj.com";
+      AuthRequest authRequest = getAuthRequest(AUTH_CONFIG,redirectUri);
       AuthResponse<AuthUser> response = authRequest.login(authCallback);
 
       if (response.ok()) {
         AuthUser authUser = response.getData();
         JustIdentityProviderConfig config = JustIdentityProvider.this.getConfig();
         BrokeredIdentityContext federatedIdentity = new BrokeredIdentityContext(authUser.getUuid());
-        authUser.getRawUserInfo().forEach((k, v) -> {
-          federatedIdentity.setUserAttribute(config.getAlias() + "-" + k, JSONObject.toJSONString(v));
+        authUser.getRawUserInfo().forEach((k,v)->{
+          federatedIdentity.setUserAttribute(config.getAlias()+"-"+k, JSONObject.toJSONString(v));
         });
+        federatedIdentity.setBrokerUserId(authUser.getUuid());
         federatedIdentity.setIdpConfig(config);
         federatedIdentity.setIdp(JustIdentityProvider.this);
         federatedIdentity.setCode(state);
+
+        // must
+        JsonNode profile = null;
+        try {
+          profile = objectMapper.readTree(authUser.getRawUserInfo().toJSONString());
+        } catch (JsonProcessingException e) {
+          // can't
+        }
+        AbstractJsonUserAttributeMapper.storeUserProfileForMapper(federatedIdentity, profile, getConfig().getAlias());
+
         return this.callback.authenticated(federatedIdentity);
       } else {
         return this.errorIdentityProviderLogin("identityProviderUnexpectedErrorMessage");
