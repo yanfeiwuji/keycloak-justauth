@@ -7,6 +7,7 @@ import me.zhyd.oauth.model.AuthResponse;
 import me.zhyd.oauth.model.AuthUser;
 import me.zhyd.oauth.request.AuthDefaultRequest;
 import me.zhyd.oauth.request.AuthRequest;
+import me.zhyd.oauth.request.AuthWeChatEnterpriseRequest;
 import me.zhyd.oauth.request.AuthWeChatOpenRequest;
 import org.keycloak.broker.oidc.AbstractOAuth2IdentityProvider;
 import org.keycloak.broker.oidc.OAuth2IdentityProviderConfig;
@@ -110,10 +111,12 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
         Constructor constructor = tClass.getConstructor(AuthConfig.class);
         authRequest = (AuthRequest) constructor.newInstance(JustAuthKey.getAuthConfig(JustIdentityProvider.this.getConfig()));
       } catch (Exception e) {
+        logger.info("error get authRequest");
         e.printStackTrace();
       }
 
-      AuthResponse<AuthUser> response = authRequest.login(authCallback);
+      AuthResponse<AuthUser> response = new AuthWeChatEnterpriseRequest(AUTH_CONFIG).login(authCallback);
+      // AuthResponse<AuthUser> response = authRequest.login(authCallback);
       if (response.ok()) {
         AuthUser authUser = response.getData();
         JustIdentityProviderConfig config = JustIdentityProvider.this.getConfig();
