@@ -8,9 +8,7 @@ import me.zhyd.oauth.model.AuthUser;
 import me.zhyd.oauth.request.AuthDefaultRequest;
 import me.zhyd.oauth.request.AuthRequest;
 import me.zhyd.oauth.request.AuthWeChatEnterpriseRequest;
-import me.zhyd.oauth.request.AuthWeChatOpenRequest;
 import org.keycloak.broker.oidc.AbstractOAuth2IdentityProvider;
-import org.keycloak.broker.oidc.OAuth2IdentityProviderConfig;
 import org.keycloak.broker.provider.AuthenticationRequest;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.broker.social.SocialIdentityProvider;
@@ -29,8 +27,6 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.logging.Logger;
 
 /**
  * @author yanfeiwuji
@@ -55,18 +51,23 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
 
   @Override
   protected UriBuilder createAuthorizationUrl(AuthenticationRequest request) {
-    AUTH_CONFIG.setRedirectUri(request.getRedirectUri());
+    String redirectUri =  request.getRedirectUri();
+    AuthRequest authRequest = getAuthRequest(AUTH_CONFIG,redirectUri);
+    String uri = authRequest.authorize(request.getState().getEncoded());
+    return UriBuilder.fromUri(uri);
+  }
+
+  private AuthRequest getAuthRequest(AuthConfig authConfig, String redirectUri){
     AuthRequest authRequest = null;
+    authConfig.setRedirectUri(redirectUri);
     try {
       Constructor<? extends AuthDefaultRequest> constructor = tClass.getConstructor(AuthConfig.class);
-      authRequest = constructor.newInstance(AUTH_CONFIG);
+      authRequest = constructor.newInstance(authConfig);
     } catch (Exception e) {
       // can't
       logger.error(e.getMessage());
     }
-
-    String uri = authRequest.authorize(request.getState().getEncoded());
-    return UriBuilder.fromUri(uri);
+    return authRequest;
   }
 
   @Override
@@ -104,31 +105,10 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
                                  @QueryParam("error") String error) {
       AuthCallback authCallback = AuthCallback.builder().code(authorizationCode).state(state).build();
 
-      Class<? extends AuthDefaultRequest> tClass = JustIdentityProvider.this.getConfig().getJustAuthKey().getTClass();
-      AuthRequest authRequest = null;
-      String red =  session.getContext().getUri().getDelegate().getAbsolutePath().getPath();
-      logger.info(red);
-
-      String basePath =  session.getContext().getUri().getBaseUri().getPath();
-      logger.info("basePath: "+basePath);
-      logger.info(AUTH_CONFIG.getClientSecret());
-      logger.info(AUTH_CONFIG.getRedirectUri());
-      logger.info(AUTH_CONFIG.getClientId());
-      logger.info(AUTH_CONFIG.getAgentId());
-
-      AUTH_CONFIG.setRedirectUri("http://keycloak.yanfeiwuji.xyz/auth/realms/master/broker/wework/endpoint");
-      try {
-
-        Constructor constructor = tClass.getConstructor(AuthConfig.class);
-        authRequest = (AuthRequest) constructor.newInstance(AUTH_CONFIG);
-      } catch (Exception e) {
-        logger.info("error get authRequest");
-        e.printStackTrace();
-      }
-
-
-      authRequest = new AuthWeChatEnterpriseRequest(AUTH_CONFIG);
+      String redirectUri =  session.getContext().getAuthenticationSession().getRedirectUri();
+      AuthRequest  authRequest = getAuthRequest(AUTH_CONFIG,redirectUri);
       AuthResponse<AuthUser> response = authRequest.login(authCallback);
+
       if (response.ok()) {
         AuthUser authUser = response.getData();
         JustIdentityProviderConfig config = JustIdentityProvider.this.getConfig();
