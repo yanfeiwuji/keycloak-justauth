@@ -55,7 +55,15 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
   @Override
   protected UriBuilder createAuthorizationUrl(AuthenticationRequest request) {
     AUTH_CONFIG.setRedirectUri(request.getRedirectUri());
-    AuthRequest authRequest = getAuthRequest(AUTH_CONFIG);
+    AuthRequest authRequest = null;
+    try {
+      Constructor<? extends AuthDefaultRequest> constructor = tClass.getConstructor(AuthConfig.class);
+      authRequest = constructor.newInstance(AUTH_CONFIG);
+    } catch (Exception e) {
+      // can't
+      logger.error(e.getMessage());
+    }
+
     String uri = authRequest.authorize(request.getState().getEncoded());
     return UriBuilder.fromUri(uri);
   }
@@ -70,17 +78,6 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
     return new Endpoint(callback, realm, event);
   }
 
-  private AuthRequest getAuthRequest(AuthConfig authConfig) {
-    AuthRequest authRequest = null;
-    try {
-      Constructor<? extends AuthDefaultRequest> constructor = tClass.getConstructor(AuthConfig.class);
-      authRequest = constructor.newInstance(authConfig);
-    } catch (Exception e) {
-      // can't
-      logger.error(e.getMessage());
-    }
-    return authRequest;
-  }
 
 
   protected class Endpoint {
@@ -105,7 +102,16 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
                                  @QueryParam("code") String authorizationCode,
                                  @QueryParam("error") String error) {
       AuthCallback authCallback = AuthCallback.builder().code(authorizationCode).state(state).build();
-      AuthRequest authRequest = JustIdentityProvider.this.getAuthRequest(AUTH_CONFIG);
+      AuthRequest authRequest = null;
+      try {
+        Constructor<? extends AuthDefaultRequest> constructor = tClass.getConstructor(AuthConfig.class);
+        authRequest = constructor.newInstance(AUTH_CONFIG);
+      } catch (Exception e) {
+        // can't
+        logger.error(e.getMessage());
+      }
+
+
       AuthResponse<AuthUser> response = authRequest.login(authCallback);
       if (response.ok()) {
         AuthUser authUser = response.getData();
