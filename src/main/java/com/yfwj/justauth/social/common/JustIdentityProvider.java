@@ -106,6 +106,7 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
       Class<? extends AuthDefaultRequest> tClass = JustIdentityProvider.this.getConfig().getJustAuthKey().getTClass();
       AuthRequest authRequest = null;
       try {
+
         Constructor constructor = tClass.getConstructor(AuthConfig.class);
         authRequest = (AuthRequest) constructor.newInstance(JustAuthKey.getAuthConfig(JustIdentityProvider.this.getConfig()));
       } catch (Exception e) {
