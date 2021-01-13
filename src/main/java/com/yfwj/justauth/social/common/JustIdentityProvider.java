@@ -44,7 +44,7 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
   public final AuthConfig AUTH_CONFIG;
   public final Class<? extends AuthDefaultRequest> tClass;
 
-  private AuthRequest authRequest;
+  private AuthRequest callBackAuthRequest;
 
   public JustIdentityProvider(KeycloakSession session, JustIdentityProviderConfig config) {
     super(session, config);
@@ -57,15 +57,19 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
   @Override
   protected UriBuilder createAuthorizationUrl(AuthenticationRequest request) {
     AUTH_CONFIG.setRedirectUri(request.getRedirectUri());
+    AuthRequest authRequest = null;
     try {
       Constructor<? extends AuthDefaultRequest> constructor = tClass.getConstructor(AuthConfig.class);
       authRequest = constructor.newInstance(AUTH_CONFIG);
+      callBackAuthRequest = constructor.newInstance(AUTH_CONFIG);
     } catch (Exception e) {
       // can't
       logger.error(e.getMessage());
     }
 
     String uri = authRequest.authorize(request.getState().getEncoded());
+    logger.info(authRequest);
+
     return UriBuilder.fromUri(uri);
   }
 
@@ -76,7 +80,7 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
 
   @Override
   public Object callback(RealmModel realm, AuthenticationCallback callback, EventBuilder event) {
-    return new Endpoint(callback, realm, event, authRequest);
+    return new Endpoint(callback, realm, event, callBackAuthRequest);
   }
 
 
