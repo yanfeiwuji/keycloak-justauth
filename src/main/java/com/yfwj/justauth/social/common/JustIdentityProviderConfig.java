@@ -9,8 +9,9 @@ import org.keycloak.models.IdentityProviderModel;
  */
 public class JustIdentityProviderConfig extends OAuth2IdentityProviderConfig {
 
-  private static final String AGENT_ID_KEY = "agentId";
+  private static final String AGENT_ID_KEY = "weworkAgentId";
   private static final String ALIPAY_PUBLIC_KEY = "alipayPublicKey";
+  private static final String CODING_GROUP_NAME = "codingGroupName";
 
   private JustAuthKey justAuthKey;
 
@@ -42,6 +43,18 @@ public class JustIdentityProviderConfig extends OAuth2IdentityProviderConfig {
   }
 
   public void setAlipayPublicKey(String alipayPublicKey) {
+
     getConfig().put(ALIPAY_PUBLIC_KEY, alipayPublicKey);
   }
+
+  public String getCodingGroupName() {
+    return getConfig().get(CODING_GROUP_NAME);
+  }
+
+  public void setCodingGroupName(String codingGroupName) {
+    getConfig().put(CODING_GROUP_NAME, codingGroupName);
+
+  }
+
+
 }

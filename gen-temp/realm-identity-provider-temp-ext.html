@@ -1,7 +1,29 @@
+<!--wework-->
 <div class="form-group clearfix">
-  <label class="col-md-2 control-label" for="agentId">{{:: 'key' | translate}} <span class="required">*</span></label>
+  <label class="col-md-2 control-label" for="agentId">{{:: 'agentId' | translate}} <span class="required">*</span></label>
   <div class="col-md-6">
-    <input class="form-control" id="agentId" type="text" ng-model="identityProvider.config.agentId" required>
+    <input class="form-control" id="agentId" type="text" ng-model="identityProvider.config.weworkAgentId" required>
   </div>
   <kc-tooltip>{{:: 'wework.agentId.tooltip' | translate}}</kc-tooltip>
 </div>
+
+
+<!--ali pay-->
+<div class="form-group clearfix">
+  <label class="col-md-2 control-label" for="publicKey">{{:: 'publicKey' | translate}} <span class="required">*</span></label>
+  <div class="col-md-6">
+    <input class="form-control" id="publicKey" type="text" ng-model="identityProvider.config.alipayPublicKey" required>
+  </div>
+  <kc-tooltip>{{:: 'alipay.publicKey.tooltip' | translate}}</kc-tooltip>
+</div>
+
+
+<!--coding-->
+<div class="form-group clearfix">
+  <label class="col-md-2 control-label" for="groupName">{{:: 'groupName' | translate}} <span class="required">*</span></label>
+  <div class="col-md-6">
+    <input class="form-control" id="groupName" type="text" ng-model="identityProvider.config.codingGroupName" required>
+  </div>
+  <kc-tooltip>{{:: 'coding.groupName.tooltip' | translate}}</kc-tooltip>
+</div>
+

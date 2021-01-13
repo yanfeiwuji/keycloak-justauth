@@ -114,6 +114,7 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
       AuthRequest authRequest = getAuthRequest(AUTH_CONFIG, redirectUri);
       AuthResponse<AuthUser> response = authRequest.login(authCallback);
 
+
       if (response.ok()) {
         AuthUser authUser = response.getData();
         JustIdentityProviderConfig config = JustIdentityProvider.this.getConfig();

@@ -98,6 +98,8 @@ public enum JustAuthKey {
     String clientSecret = config.getClientSecret();
     String agentId = config.getAgentId();
     String alipayPublicKey = config.getAlipayPublicKey();
+    String codingGroupName = config.getCodingGroupName();
+
     AuthConfig.AuthConfigBuilder authConfigBuilder = justAuthKey.getAuthConfig().clientId(clientId).clientSecret(clientSecret);
     switch (justAuthKey) {
       case WEWORK:
@@ -105,6 +107,8 @@ public enum JustAuthKey {
         break;
       case ALIPAY:
         authConfigBuilder.alipayPublicKey(alipayPublicKey);
+      case CODEING:
+        authConfigBuilder.codingGroupName(codingGroupName);
     }
     return authConfigBuilder.build();
   }
