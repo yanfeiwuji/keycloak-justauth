@@ -45,8 +45,6 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
   public final AuthConfig AUTH_CONFIG;
   public final Class<? extends AuthDefaultRequest> tClass;
 
-  private static final ObjectMapper objectMapper = new ObjectMapper();
-
 
   public JustIdentityProvider(KeycloakSession session, JustIdentityProviderConfig config) {
     super(session, config);
@@ -121,17 +119,23 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
         JustIdentityProviderConfig config = JustIdentityProvider.this.getConfig();
         BrokeredIdentityContext federatedIdentity = new BrokeredIdentityContext(authUser.getUuid());
         authUser.getRawUserInfo().forEach((k, v) -> {
-          logger.info(k + "==" + v);
-          federatedIdentity.setUserAttribute(config.getAlias() + "-" + k, JSONObject.toJSONString(v));
+          String value = (v instanceof String) ? v.toString() : JSONObject.toJSONString(v);
+          // v  不能过长
+          federatedIdentity.setUserAttribute(config.getAlias() + "-" + k, value);
         });
 
+        if (getConfig().isStoreToken()) {
+          // make sure that token wasn't already set by getFederatedIdentity();
+          // want to be able to allow provider to set the token itself.
+          if (federatedIdentity.getToken() == null) federatedIdentity.setToken(authUser.getToken().getAccessToken());
+        }
 
-        federatedIdentity.setUsername(authUser.getUsername());
-
+        federatedIdentity.setUsername(authUser.getUuid());
         federatedIdentity.setBrokerUserId(authUser.getUuid());
         federatedIdentity.setIdpConfig(config);
         federatedIdentity.setIdp(JustIdentityProvider.this);
         federatedIdentity.setCode(state);
+
         return this.callback.authenticated(federatedIdentity);
       } else {
         return this.errorIdentityProviderLogin("identityProviderUnexpectedErrorMessage");
