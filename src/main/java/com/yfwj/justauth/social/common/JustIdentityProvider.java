@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.logging.Logger;
 
 /**
  * @author yanfeiwuji
@@ -56,7 +57,6 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
     AUTH_CONFIG.setRedirectUri(request.getRedirectUri());
     AuthRequest authRequest = getAuthRequest(AUTH_CONFIG);
     String uri = authRequest.authorize(request.getState().getEncoded());
-
     return UriBuilder.fromUri(uri);
   }
 
@@ -74,9 +74,10 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
     AuthRequest authRequest = null;
     try {
       Constructor<? extends AuthDefaultRequest> constructor = tClass.getConstructor(AuthConfig.class);
-      authRequest = (AuthRequest) constructor.newInstance(authConfig);
+      authRequest = constructor.newInstance(authConfig);
     } catch (Exception e) {
       // can't
+      logger.error(e.getMessage());
     }
     return authRequest;
   }
