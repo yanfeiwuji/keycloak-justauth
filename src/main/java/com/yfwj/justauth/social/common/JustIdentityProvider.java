@@ -106,11 +106,12 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
 
       Class<? extends AuthDefaultRequest> tClass = JustIdentityProvider.this.getConfig().getJustAuthKey().getTClass();
       AuthRequest authRequest = null;
+      String red =  session.getContext().getUri().getDelegate().getAbsolutePath().getPath();
       logger.info(AUTH_CONFIG.getClientSecret());
       logger.info(AUTH_CONFIG.getRedirectUri());
       logger.info(AUTH_CONFIG.getClientId());
       logger.info(AUTH_CONFIG.getAgentId());
-      AUTH_CONFIG.setRedirectUri("default");
+      AUTH_CONFIG.setRedirectUri(red);
       try {
 
         Constructor constructor = tClass.getConstructor(AuthConfig.class);
