@@ -44,6 +44,7 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
   public final AuthConfig AUTH_CONFIG;
   public final Class<? extends AuthDefaultRequest> tClass;
 
+  private AuthRequest authRequest;
   public JustIdentityProvider(KeycloakSession session, JustIdentityProviderConfig config) {
     super(session, config);
     JustAuthKey justAuthKey = config.getJustAuthKey();
@@ -55,7 +56,6 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
   @Override
   protected UriBuilder createAuthorizationUrl(AuthenticationRequest request) {
     AUTH_CONFIG.setRedirectUri(request.getRedirectUri());
-    AuthRequest authRequest = null;
     try {
       Constructor<? extends AuthDefaultRequest> constructor = tClass.getConstructor(AuthConfig.class);
       authRequest = constructor.newInstance(AUTH_CONFIG);
@@ -104,16 +104,6 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
                                  @QueryParam("code") String authorizationCode,
                                  @QueryParam("error") String error) {
       AuthCallback authCallback = AuthCallback.builder().code(authorizationCode).state(state).build();
-      AuthRequest authRequest = null;
-      try {
-        Constructor<? extends AuthDefaultRequest> constructor = authClass.getConstructor(AuthConfig.class);
-        authRequest = constructor.newInstance(AUTH_CONFIG);
-      } catch (Exception e) {
-        // can't
-        logger.error(e.getMessage());
-      }
-
-
       AuthResponse<AuthUser> response = authRequest.login(authCallback);
       if (response.ok()) {
         AuthUser authUser = response.getData();
