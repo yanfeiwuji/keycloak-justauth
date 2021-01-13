@@ -75,7 +75,7 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
 
   @Override
   public Object callback(RealmModel realm, AuthenticationCallback callback, EventBuilder event) {
-    return new Endpoint(callback, realm, event);
+    return new Endpoint(callback, realm, event,tClass);
   }
 
 
@@ -91,10 +91,12 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
     @Context
     protected HttpHeaders headers;
 
-    public Endpoint(AuthenticationCallback callback, RealmModel realm, EventBuilder event) {
+    protected Class<? extends AuthDefaultRequest> authClass;
+    public Endpoint(AuthenticationCallback callback, RealmModel realm, EventBuilder event,Class<? extends AuthDefaultRequest> tClass) {
       this.callback = callback;
       this.realm = realm;
       this.event = event;
+      this.authClass = tClass;
     }
 
     @GET
@@ -104,7 +106,7 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
       AuthCallback authCallback = AuthCallback.builder().code(authorizationCode).state(state).build();
       AuthRequest authRequest = null;
       try {
-        Constructor<? extends AuthDefaultRequest> constructor = tClass.getConstructor(AuthConfig.class);
+        Constructor<? extends AuthDefaultRequest> constructor = authClass.getConstructor(AuthConfig.class);
         authRequest = constructor.newInstance(AUTH_CONFIG);
       } catch (Exception e) {
         // can't
