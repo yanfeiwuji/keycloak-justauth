@@ -45,6 +45,7 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
   public final Class<? extends AuthDefaultRequest> tClass;
 
   private AuthRequest authRequest;
+
   public JustIdentityProvider(KeycloakSession session, JustIdentityProviderConfig config) {
     super(session, config);
     JustAuthKey justAuthKey = config.getJustAuthKey();
@@ -75,9 +76,8 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
 
   @Override
   public Object callback(RealmModel realm, AuthenticationCallback callback, EventBuilder event) {
-    return new Endpoint(callback, realm, event,tClass);
+    return new Endpoint(callback, realm, event, authRequest);
   }
-
 
 
   protected class Endpoint {
@@ -91,12 +91,13 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
     @Context
     protected HttpHeaders headers;
 
-    protected Class<? extends AuthDefaultRequest> authClass;
-    public Endpoint(AuthenticationCallback callback, RealmModel realm, EventBuilder event,Class<? extends AuthDefaultRequest> tClass) {
+    protected AuthRequest authRequest;
+
+    public Endpoint(AuthenticationCallback callback, RealmModel realm, EventBuilder event, AuthRequest authRequest) {
       this.callback = callback;
       this.realm = realm;
       this.event = event;
-      this.authClass = tClass;
+      this.authRequest = authRequest;
     }
 
     @GET
@@ -104,7 +105,8 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
                                  @QueryParam("code") String authorizationCode,
                                  @QueryParam("error") String error) {
       AuthCallback authCallback = AuthCallback.builder().code(authorizationCode).state(state).build();
-      AuthResponse<AuthUser> response = authRequest.login(authCallback);
+      logger.info(this.authRequest+"======");
+      AuthResponse<AuthUser> response = this.authRequest.login(authCallback);
       if (response.ok()) {
         AuthUser authUser = response.getData();
         JustIdentityProviderConfig config = JustIdentityProvider.this.getConfig();
