@@ -105,7 +105,8 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
                                  @QueryParam("error") String error) {
       AuthCallback authCallback = AuthCallback.builder().code(authorizationCode).state(state).build();
 
-      String redirectUri =  session.getContext().getAuthenticationSession().getRedirectUri();
+      // 没有check 不通过
+      String redirectUri =  "https://www.yfwj.com";
       AuthRequest  authRequest = getAuthRequest(AUTH_CONFIG,redirectUri);
       AuthResponse<AuthUser> response = authRequest.login(authCallback);
 
