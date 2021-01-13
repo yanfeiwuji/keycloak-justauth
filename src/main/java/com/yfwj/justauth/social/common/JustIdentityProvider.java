@@ -106,16 +106,24 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
 
       Class<? extends AuthDefaultRequest> tClass = JustIdentityProvider.this.getConfig().getJustAuthKey().getTClass();
       AuthRequest authRequest = null;
+      logger.info(AUTH_CONFIG.getClientSecret());
+      logger.info(AUTH_CONFIG.getRedirectUri());
+      logger.info(AUTH_CONFIG.getClientId());
+      logger.info(AUTH_CONFIG.getAgentId());
+      AuthConfig authConfig = JustAuthKey.getAuthConfig(JustIdentityProvider.this.getConfig());
+      authConfig.setRedirectUri("default");
       try {
 
         Constructor constructor = tClass.getConstructor(AuthConfig.class);
-        authRequest = (AuthRequest) constructor.newInstance(JustAuthKey.getAuthConfig(JustIdentityProvider.this.getConfig()));
+
+        authRequest = (AuthRequest) constructor.newInstance(authConfig);
       } catch (Exception e) {
         logger.info("error get authRequest");
         e.printStackTrace();
       }
 
-      AuthResponse<AuthUser> response = new AuthWeChatEnterpriseRequest(AUTH_CONFIG).login(authCallback);
+
+      AuthResponse<AuthUser> response = authRequest.login(authCallback);
       // AuthResponse<AuthUser> response = authRequest.login(authCallback);
       if (response.ok()) {
         AuthUser authUser = response.getData();
