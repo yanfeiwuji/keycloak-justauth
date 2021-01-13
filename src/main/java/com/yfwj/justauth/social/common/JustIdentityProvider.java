@@ -110,6 +110,7 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
       AuthResponse<AuthUser> response = authRequest.login(authCallback);
 
       if (response.ok()) {
+
         AuthUser authUser = response.getData();
         JustIdentityProviderConfig config = JustIdentityProvider.this.getConfig();
         BrokeredIdentityContext federatedIdentity = new BrokeredIdentityContext(authUser.getUuid());
