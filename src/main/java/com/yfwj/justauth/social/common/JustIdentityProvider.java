@@ -107,11 +107,16 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
       Class<? extends AuthDefaultRequest> tClass = JustIdentityProvider.this.getConfig().getJustAuthKey().getTClass();
       AuthRequest authRequest = null;
       String red =  session.getContext().getUri().getDelegate().getAbsolutePath().getPath();
+      logger.info(red);
+
+      String basePath =  session.getContext().getUri().getBaseUri().getPath();
+      logger.info("basePath: "+basePath);
       logger.info(AUTH_CONFIG.getClientSecret());
       logger.info(AUTH_CONFIG.getRedirectUri());
       logger.info(AUTH_CONFIG.getClientId());
       logger.info(AUTH_CONFIG.getAgentId());
-      AUTH_CONFIG.setRedirectUri(red);
+
+      AUTH_CONFIG.setRedirectUri("http://keycloak.yanfeiwuji.xyz/auth/realms/master/broker/wework/endpoint");
       try {
 
         Constructor constructor = tClass.getConstructor(AuthConfig.class);
