@@ -38,29 +38,23 @@ import java.lang.reflect.InvocationTargetException;
 
 public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIdentityProviderConfig> implements SocialIdentityProvider<JustIdentityProviderConfig> {
 
-  public final String DEFAULT_SCOPES ="default";
+  public final String DEFAULT_SCOPES = "default";
   //OAuth2IdentityProviderConfig
   public final AuthConfig AUTH_CONFIG;
-  public final Class<? extends AuthDefaultRequest>  tClass;
+  public final Class<? extends AuthDefaultRequest> tClass;
 
   public JustIdentityProvider(KeycloakSession session, JustIdentityProviderConfig config) {
     super(session, config);
     JustAuthKey justAuthKey = config.getJustAuthKey();
     AUTH_CONFIG = JustAuthKey.getAuthConfig(config, justAuthKey);
-    this.tClass =  justAuthKey.getTClass();
+    this.tClass = justAuthKey.getTClass();
 
   }
 
   @Override
   protected UriBuilder createAuthorizationUrl(AuthenticationRequest request) {
     AUTH_CONFIG.setRedirectUri(request.getRedirectUri());
-    AuthRequest  authRequest= null;
-    try {
-      Constructor<? extends AuthDefaultRequest> constructor = tClass.getConstructor(AuthConfig.class);
-      authRequest= (AuthRequest) constructor.newInstance(AUTH_CONFIG);
-    } catch (Exception e) {
-      // can't
-    }
+    AuthRequest authRequest = getAuthRequest(AUTH_CONFIG);
     String uri = authRequest.authorize(request.getState().getEncoded());
 
     return UriBuilder.fromUri(uri);
@@ -74,7 +68,17 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
   @Override
   public Object callback(RealmModel realm, AuthenticationCallback callback, EventBuilder event) {
     return new Endpoint(callback, realm, event);
+  }
 
+  private AuthRequest getAuthRequest(AuthConfig authConfig) {
+    AuthRequest authRequest = null;
+    try {
+      Constructor<? extends AuthDefaultRequest> constructor = tClass.getConstructor(AuthConfig.class);
+      authRequest = (AuthRequest) constructor.newInstance(authConfig);
+    } catch (Exception e) {
+      // can't
+    }
+    return authRequest;
   }
 
 
@@ -100,13 +104,13 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
                                  @QueryParam("code") String authorizationCode,
                                  @QueryParam("error") String error) {
       AuthCallback authCallback = AuthCallback.builder().code(authorizationCode).state(state).build();
-      AuthRequest authRequest = new AuthWeChatOpenRequest(AUTH_CONFIG);
+      AuthRequest authRequest = JustIdentityProvider.this.getAuthRequest(AUTH_CONFIG);
       AuthResponse<AuthUser> response = authRequest.login(authCallback);
       if (response.ok()) {
         AuthUser authUser = response.getData();
         JustIdentityProviderConfig config = JustIdentityProvider.this.getConfig();
         BrokeredIdentityContext federatedIdentity = new BrokeredIdentityContext(authUser.getUuid());
-        federatedIdentity.setUserAttribute(config.getAlias(),authUser.getRawUserInfo().toJSONString());
+        federatedIdentity.setUserAttribute(config.getAlias(), authUser.getRawUserInfo().toJSONString());
         federatedIdentity.setIdpConfig(config);
         federatedIdentity.setIdp(JustIdentityProvider.this);
         federatedIdentity.setCode(state);
