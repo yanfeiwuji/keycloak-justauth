@@ -14,6 +14,7 @@ import org.keycloak.models.KeycloakSession;
  * @date 2021/1/10 5:48 下午
  */
 
+
 public class AlipayIdentityProviderFactory extends
   AbstractIdentityProviderFactory<JustIdentityProvider>
   implements SocialIdentityProviderFactory<JustIdentityProvider> {
