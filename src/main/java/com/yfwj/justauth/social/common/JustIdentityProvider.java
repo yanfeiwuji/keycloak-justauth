@@ -128,7 +128,9 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
         if (getConfig().isStoreToken()) {
           // make sure that token wasn't already set by getFederatedIdentity();
           // want to be able to allow provider to set the token itself.
-          if (federatedIdentity.getToken() == null) federatedIdentity.setToken(authUser.getToken().getAccessToken());
+          if (federatedIdentity.getToken() == null) {
+            federatedIdentity.setToken(authUser.getToken().getAccessToken());
+          }
         }
 
         federatedIdentity.setUsername(authUser.getUuid());
