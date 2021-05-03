@@ -6,6 +6,41 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "3876347",
+      "name": "line",
+      "font_class": "line",
+      "unicode": "e63f",
+      "unicode_decimal": 58943
+    },
+    {
+      "icon_id": "11728760",
+      "name": "slack",
+      "font_class": "slack",
+      "unicode": "e747",
+      "unicode_decimal": 59207
+    },
+    {
+      "icon_id": "20210304",
+      "name": "amazon",
+      "font_class": "amazon",
+      "unicode": "e623",
+      "unicode_decimal": 58915
+    },
+    {
+      "icon_id": "20611352",
+      "name": "okta",
+      "font_class": "okta",
+      "unicode": "e641",
+      "unicode_decimal": 58945
+    },
+    {
+      "icon_id": "8391890",
+      "name": "喜马拉雅电台",
+      "font_class": "ximalayadiantai",
+      "unicode": "e7bd",
+      "unicode_decimal": 59325
+    },
+    {
       "icon_id": "471589",
       "name": "美团",
       "font_class": "iconpingtaimeituan01",

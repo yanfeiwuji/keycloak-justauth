@@ -23,45 +23,56 @@ public enum JustAuthKey {
     AuthBaiduScope.SUPER_MSG.getScope(),
     AuthBaiduScope.NETDISK.getScope()
   )),
-  GITEE("gitee", "gitee",AuthGiteeRequest.class),
+  GITEE("gitee", "gitee", AuthGiteeRequest.class),
 
-  WEIBO("weibo", "微博", AuthWeiboRequest.class,Arrays.asList(
+  WEIBO("weibo", "微博", AuthWeiboRequest.class, Arrays.asList(
     AuthWeiboScope.EMAIL.getScope(),
     AuthWeiboScope.FRIENDSHIPS_GROUPS_READ.getScope(),
     AuthWeiboScope.STATUSES_TO_ME_READ.getScope()
   )),
 
-  CODEING("coding", "coding",AuthCodingRequest.class, Arrays.asList(
+  CODEING("coding", "coding", AuthCodingRequest.class, Arrays.asList(
     AuthCodingScope.USER.getScope(),
     AuthCodingScope.USER_EMAIL.getScope(),
     AuthCodingScope.USER_PHONE.getScope()
   )),
 
-  OSCHINA("oschina", "开源中国",AuthOschinaRequest.class),
-  ALIPAY("alipay", "支付宝",AuthAlipayRequest.class),
-  QQ("qq", "QQ",AuthQqRequest.class),
-  CSDN("csdn", "CSDN",AuthCsdnRequest.class),
-  TAOBAO("taobao", "淘宝",AuthTaobaoRequest.class),
-  DOUYIN("douyin", "抖音",AuthDouyinRequest.class),
-  MI("mi", "小米",AuthMiRequest.class),
-  TOUTIAO("toutiao", "头条",AuthToutiaoRequest.class),
-  TEAMBITION("teambition", "Teambition",AuthTeambitionRequest.class),
-  PINTEREST("pinterest", "pinterest",AuthPinterestRequest.class),
-  RENREN("renren", "人人",AuthRenrenRequest.class),
-  HUAWEI("huawei", "华为",AuthHuaweiRequest.class, Arrays.asList(
+  OSCHINA("oschina", "开源中国", AuthOschinaRequest.class),
+  ALIPAY("alipay", "支付宝", AuthAlipayRequest.class),
+  QQ("qq", "QQ", AuthQqRequest.class),
+  CSDN("csdn", "CSDN", AuthCsdnRequest.class),
+  TAOBAO("taobao", "淘宝", AuthTaobaoRequest.class),
+  DOUYIN("douyin", "抖音", AuthDouyinRequest.class),
+  MI("mi", "小米", AuthMiRequest.class),
+  TOUTIAO("toutiao", "头条", AuthToutiaoRequest.class),
+  TEAMBITION("teambition", "Teambition", AuthTeambitionRequest.class),
+  PINTEREST("pinterest", "pinterest", AuthPinterestRequest.class),
+  RENREN("renren", "人人", AuthRenrenRequest.class),
+  HUAWEI("huawei", "华为", AuthHuaweiRequest.class, Arrays.asList(
     AuthHuaweiScope.BASE_PROFILE.getScope(),
     AuthHuaweiScope.MOBILE_NUMBER.getScope(),
     AuthHuaweiScope.ACCOUNTLIST.getScope(),
     AuthHuaweiScope.SCOPE_DRIVE_FILE.getScope(),
     AuthHuaweiScope.SCOPE_DRIVE_APPDATA.getScope()
   )),
-  WEWORK("wework", "企业微信",AuthWeChatEnterpriseRequest.class),
-  KUJIALE("kujiale", "酷家乐",AuthKujialeRequest.class),
-  MEITUAN("meituan", "美团",AuthMeituanRequest.class),
-  ELEME("eleme", "饿了么",AuthElemeRequest.class),
-  ALIYUN("aliyun", "阿里云",AuthAliyunRequest.class),
-  // XMLY("xmly", "喜马拉雅",Aut.),
-  FEISHU("feishu", "飞书",AuthFeishuRequest.class);
+
+  //扫描二维码登陆
+  WEWORK("wework", "企业微信", AuthWeChatEnterpriseQrcodeRequest.class),
+  // 企业微信客户端内登陆
+  WEWORK_WEB("wework_web", "企业微信客户端内登陆", AuthWeChatEnterpriseWebRequest.class),
+
+  KUJIALE("kujiale", "酷家乐", AuthKujialeRequest.class),
+  MEITUAN("meituan", "美团", AuthMeituanRequest.class),
+  ELEME("eleme", "饿了么", AuthElemeRequest.class),
+  ALIYUN("aliyun", "阿里云", AuthAliyunRequest.class),
+  XMLY("xmly", "喜马拉雅", AuthXmlyRequest.class),
+  AMAZON("amazon", "亚马逊", AuthAmazonRequest.class),
+  SLACK("slack","slack",AuthSlackRequest.class),
+  LINE("line","line",AuthLineRequest.class),
+  OKTA("okta","okta",AuthOktaRequest.class),
+  DING_ACCOUNT("ding_account","钉钉账号登陆",AuthDingTalkAccountRequest.class),
+  FEISHU("feishu", "飞书", AuthFeishuRequest.class);
+
   private String id;
   private String name;
   private Class<? extends AuthDefaultRequest> tClass;
@@ -70,19 +81,19 @@ public enum JustAuthKey {
   private Boolean proxy = false;
 
   JustAuthKey(String id, String name, Class<? extends AuthDefaultRequest> tClass, List<String> scopes) {
-    this(id, name,tClass);
+    this(id, name, tClass);
     this.scopes = scopes;
   }
 
-  JustAuthKey(String id, String name,Class<? extends AuthDefaultRequest> tClass, List<String> scopes, boolean proxy) {
-    this(id, name,tClass,scopes);
+  JustAuthKey(String id, String name, Class<? extends AuthDefaultRequest> tClass, List<String> scopes, boolean proxy) {
+    this(id, name, tClass, scopes);
     this.proxy = proxy;
   }
 
-  JustAuthKey(String id, String name,Class<? extends AuthDefaultRequest> tClass) {
+  JustAuthKey(String id, String name, Class<? extends AuthDefaultRequest> tClass) {
     this.id = id;
     this.name = name;
-    this.tClass =tClass;
+    this.tClass = tClass;
   }
 
   public AuthConfig.AuthConfigBuilder getAuthConfig() {
@@ -108,8 +119,10 @@ public enum JustAuthKey {
       case ALIPAY:
         authConfigBuilder.alipayPublicKey(alipayPublicKey);
       case CODEING:
-        authConfigBuilder.codingGroupName(codingGroupName);
+        // coding 的 codingGroupName 为 domainPrefix
+        authConfigBuilder.domainPrefix(codingGroupName);
     }
+
     return authConfigBuilder.build();
   }
 

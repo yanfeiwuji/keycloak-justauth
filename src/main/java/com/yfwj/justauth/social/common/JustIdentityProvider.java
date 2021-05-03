@@ -148,7 +148,7 @@ public class JustIdentityProvider extends AbstractOAuth2IdentityProvider<JustIde
     private Response errorIdentityProviderLogin(String message) {
       this.event.event(EventType.LOGIN);
       this.event.error("identity_provider_login_failure");
-      return ErrorPage.error(this.session, (AuthenticationSessionModel) null, Response.Status.BAD_GATEWAY, message, new Object[0]);
+      return ErrorPage.error(this.session, (AuthenticationSessionModel) null, Response.Status.BAD_GATEWAY, message);
     }
   }
 }

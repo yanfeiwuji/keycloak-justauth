@@ -24,3 +24,6 @@ docker run -d -p 3306:3306 --name keycloak-mysql \
   -e MYSQL_DATABASE=keycloak \
   --network keycloak \
   mysql:5.7
+
+## 2021-05-03
+1. 升级justauth到 1.16.0 [justauth升级内容](https://justauth.wiki/update.html)

@@ -58,7 +58,7 @@ def genTemp(result):
 
 if __name__ == "__main__":
     result = getR()
-    # genClass(result)
-    # genTemp(result)
-    # printO(result)
+    #genClass(result)
+    #genTemp(result)
+    #printO(result)
     printKicon(result)

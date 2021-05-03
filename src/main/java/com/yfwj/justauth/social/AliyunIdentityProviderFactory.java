@@ -18,7 +18,7 @@ public class AliyunIdentityProviderFactory extends
   AbstractIdentityProviderFactory<JustIdentityProvider>
   implements SocialIdentityProviderFactory<JustIdentityProvider> {
 
-  public static final JustAuthKey JUST_AUTH_KEY = JustAuthKey.ALIYUN;
+  public static final JustAuthKey JUST_AUTH_KEY = JustAuthKey.  ALIYUN;
 
   @Override
   public String getName() {

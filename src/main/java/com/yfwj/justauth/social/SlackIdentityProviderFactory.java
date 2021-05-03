@@ -14,11 +14,11 @@ import org.keycloak.models.KeycloakSession;
  * @date 2021/1/10 5:48 下午
  */
 
-public class AlipayIdentityProviderFactory extends
+public class SlackIdentityProviderFactory extends
   AbstractIdentityProviderFactory<JustIdentityProvider>
   implements SocialIdentityProviderFactory<JustIdentityProvider> {
 
-  public static final JustAuthKey JUST_AUTH_KEY = JustAuthKey.  ALIPAY;
+  public static final JustAuthKey JUST_AUTH_KEY = JustAuthKey.  SLACK;
 
   @Override
   public String getName() {

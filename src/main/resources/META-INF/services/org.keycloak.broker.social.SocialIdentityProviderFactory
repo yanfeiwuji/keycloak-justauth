@@ -17,8 +17,15 @@ com.yfwj.justauth.social.PinterestIdentityProviderFactory
 com.yfwj.justauth.social.RenrenIdentityProviderFactory
 com.yfwj.justauth.social.HuaweiIdentityProviderFactory
 com.yfwj.justauth.social.WeworkIdentityProviderFactory
+com.yfwj.justauth.social.WeworkWebIdentityProviderFactory
 com.yfwj.justauth.social.KujialeIdentityProviderFactory
 com.yfwj.justauth.social.MeituanIdentityProviderFactory
 com.yfwj.justauth.social.ElemeIdentityProviderFactory
 com.yfwj.justauth.social.AliyunIdentityProviderFactory
+com.yfwj.justauth.social.XmlyIdentityProviderFactory
+com.yfwj.justauth.social.AmazonIdentityProviderFactory
+com.yfwj.justauth.social.SlackIdentityProviderFactory
+com.yfwj.justauth.social.LineIdentityProviderFactory
+com.yfwj.justauth.social.OktaIdentityProviderFactory
+com.yfwj.justauth.social.DingAccountIdentityProviderFactory
 com.yfwj.justauth.social.FeishuIdentityProviderFactory
