@@ -73,7 +73,6 @@ public enum JustAuthKey {
   DING_ACCOUNT("ding_account","钉钉账号登陆",AuthDingTalkAccountRequest.class),
   FEISHU("feishu", "飞书", AuthFeishuRequest.class);
 
-
   private String id;
   private String name;
   private Class<? extends AuthDefaultRequest> tClass;
