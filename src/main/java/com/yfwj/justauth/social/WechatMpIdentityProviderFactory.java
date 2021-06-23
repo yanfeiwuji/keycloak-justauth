@@ -18,7 +18,7 @@ public class WechatMpIdentityProviderFactory extends
   AbstractIdentityProviderFactory<JustIdentityProvider>
   implements SocialIdentityProviderFactory<JustIdentityProvider> {
 
-  public static final JustAuthKey JUST_AUTH_KEY = JustAuthKey.  WE_CHAT_MP;
+  public static final JustAuthKey JUST_AUTH_KEY = JustAuthKey.WE_CHAT_MP;
 
   @Override
   public String getName() {
@@ -27,7 +27,7 @@ public class WechatMpIdentityProviderFactory extends
 
   @Override
   public JustIdentityProvider create(KeycloakSession session, IdentityProviderModel model) {
-    return new JustIdentityProvider(session, new JustIdentityProviderConfig(model,JUST_AUTH_KEY));
+    return new JustIdentityProvider(session, new JustIdentityProviderConfig(model, JUST_AUTH_KEY));
   }
 
   @Override

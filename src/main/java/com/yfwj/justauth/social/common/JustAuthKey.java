@@ -15,7 +15,8 @@ import java.util.List;
  * @date 2021/1/12 8:48 下午
  */
 public enum JustAuthKey {
-  WE_CHAT_OPEN("wechat_open", "微信", AuthWeChatOpenRequest.class),
+  WE_CHAT_MP("wechat_mp","微信公众平台",AuthWeChatMpRequest.class),
+  WE_CHAT_OPEN("wechat_open", "微信开放平台", AuthWeChatOpenRequest.class),
   DING_TALK("ding_talk", "钉钉", AuthDingTalkRequest.class),
 
   BAI_DU("baidu", "百度", AuthBaiduRequest.class, Arrays.asList(
