@@ -29,4 +29,4 @@ docker run -d -p 3306:3306 --name keycloak-mysql \
 1. 升级justauth到 1.16.0 [justauth升级内容](https://justauth.wiki/update.html)
 
 ## 2021-06-23
-1. 添加 WE_CHAT_MP 实现
+1. 添加 WE_CHAT_MP 实现gi
