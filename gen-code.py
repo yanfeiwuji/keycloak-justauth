@@ -1,13 +1,13 @@
 
 import os
 
-codePath = "/Users/yanfeiwuji/IdeaProjects/keycloak-justauth/src/main/java/com/yfwj/justauth/social"
-needTempPath = "/Users/yanfeiwuji/IdeaProjects/keycloak-justauth/temp"
+codePath = "/Users/yanfeiwuji/IdeaProjects/yfwj/temp/keycloak-justauth/src/main/java/io/github/yanfeiwuji/justauth/social"
+needTempPath = "/Users/yanfeiwuji/IdeaProjects/yfwj/temp/keycloak-justauth/temp"
 
 
-codeTempPath = "/Users/yanfeiwuji/IdeaProjects/keycloak-justauth/gen-temp/WeChatOpenIdentityProviderFactory.java"
+codeTempPath = "/Users/yanfeiwuji/IdeaProjects/yfwj/temp/keycloak-justauth/gen-temp/WeChatOpenIdentityProviderFactory.java"
 
-jpath = "/Users/yanfeiwuji/IdeaProjects/keycloak-justauth/src/main/java/com/yfwj/justauth/social/common/JustAuthKey.java"
+jpath = "/Users/yanfeiwuji/IdeaProjects/yfwj/temp/keycloak-justauth/src/main/java/io/github/yanfeiwuji/justauth/social/common/JustAuthKey.java"
 
 
 def printO(result):
@@ -28,11 +28,13 @@ def getR():
 
         for line in f.readlines():
             if ("\"" in line) and (not ("//" in line)):
+                print(line)
                 result.append(
                     {
                         "o": line.split("\"")[1],
                         "c": line.split("\"")[1].title().replace("_", ""),
-                        "j": line.split("(")[0]
+                        "j": line.split("(")[0],
+                        "r":line.split(",")[2].split(".")[0]
                     }
                 )
     return result
@@ -40,9 +42,10 @@ def getR():
 
 def genClass(result):
     for r in result:
+        print(r)
         with open(codeTempPath) as temp, open(codePath+"/" + r["c"] + 'IdentityProviderFactory.java', "w", encoding='utf-8') as need:
             for line in temp:
-                new_line = line.replace("${C}", r["c"]).replace("${J}", r["j"])
+                new_line = line.replace("${C}", r["c"]).replace("${J}", r["j"]).replace("${R}",r["r"])
                 need.write(new_line)
 
 
@@ -58,7 +61,7 @@ def genTemp(result):
 
 if __name__ == "__main__":
     result = getR()
-    #genClass(result)
+    genClass(result)
     #genTemp(result)
     #printO(result)
     printKicon(result)

@@ -8,18 +8,18 @@ import org.keycloak.broker.provider.AbstractIdentityProviderFactory;
 import org.keycloak.broker.social.SocialIdentityProviderFactory;
 import org.keycloak.models.IdentityProviderModel;
 import org.keycloak.models.KeycloakSession;
-import me.zhyd.oauth.request.${R};
+import me.zhyd.oauth.request. AuthElemeRequest;
 
 /**
  * @author yanfeiwuji
  * @date 2021/1/10 5:48 下午
  */
 
-public class ${C}IdentityProviderFactory extends
-        AbstractIdentityProviderFactory<JustIdentityProvider<${R}>>
-        implements SocialIdentityProviderFactory<JustIdentityProvider<${R}>> {
+public class ElemeIdentityProviderFactory extends
+        AbstractIdentityProviderFactory<JustIdentityProvider< AuthElemeRequest>>
+        implements SocialIdentityProviderFactory<JustIdentityProvider< AuthElemeRequest>> {
 
-  public static final JustAuthKey JUST_AUTH_KEY = JustAuthKey.${J};
+  public static final JustAuthKey JUST_AUTH_KEY = JustAuthKey.  ELEME;
 
   @Override
   public String getName() {
@@ -27,8 +27,8 @@ public class ${C}IdentityProviderFactory extends
   }
 
   @Override
-  public JustIdentityProvider<${R}> create(KeycloakSession session, IdentityProviderModel model) {
-    return new JustIdentityProvider<>(session, new JustIdentityProviderConfig<>(model,JUST_AUTH_KEY,${R}::new));
+  public JustIdentityProvider< AuthElemeRequest> create(KeycloakSession session, IdentityProviderModel model) {
+    return new JustIdentityProvider<>(session, new JustIdentityProviderConfig<>(model,JUST_AUTH_KEY, AuthElemeRequest::new));
   }
 
   @Override

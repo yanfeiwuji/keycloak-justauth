@@ -1,14 +1,15 @@
 mvn clean package
 echo "building --- "
-rm -rf ~/tools/keycloak-jb/keycloak/providers
-mkdir ~/tools/keycloak-jb/keycloak/providers/
-cp ./target/keycloak-justauth-12.0.1-jar-with-dependencies.jar ~/tools/keycloak-jb/keycloak/providers/
+rm -rf ~/work/tools/keycloak-21.1.1/providers
+mkdir ~/work/tools/keycloak-21.1.1/providers/
+cp ./target/keycloak-justauth-21.1.1-jar-with-dependencies.jar ~/work/tools/keycloak-21.1.1/providers/
 
-cp ./ui/phone-number-add.ftl ~/tools/keycloak-jb/keycloak/themes/base/login/
+# ui change is large
+# cp ./ui/phone-number-add.ftl ~/work/tools/keycloak-21.1.1/themes/base/login/
 echo "copy success"
 # shellcheck disable=SC2028
 echo "\n"
-sh ~/tools/keycloak-jb/keycloak/bin/standalone.sh
+sh ~/work/tools/keycloak-21.1.1/bin/kc.sh start-dev
 
 
 
