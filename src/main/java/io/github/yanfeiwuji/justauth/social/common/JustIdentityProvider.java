@@ -150,12 +150,10 @@ public class JustIdentityProvider<T extends AuthDefaultRequest> extends Abstract
                     }
                 }
 
-                logger.infof("response ok mark: %s", JSONObject.toJSONString(federatedIdentity));
                 federatedIdentity.setUsername(authUser.getUuid());
                 federatedIdentity.setBrokerUserId(authUser.getUuid());
                 federatedIdentity.setIdpConfig(config);
                 federatedIdentity.setIdp(JustIdentityProvider.this);
-
                 logger.infof("response ok mark: %s", JSONObject.toJSONString(federatedIdentity));
                 return this.callback.authenticated(federatedIdentity);
             } else {
