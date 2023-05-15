@@ -58,7 +58,7 @@
 
     <dependency>
       <groupId>cn.hutool</groupId>
-      <artifactId>hutool-http</artifactId>
+      <artifactId>hutool-json</artifactId>
       <version>${hutool.version}</version>
     </dependency>
 

@@ -1,7 +1,7 @@
 package io.github.yanfeiwuji.justauth.social.common;
 
 
-import com.alibaba.fastjson.JSONObject;
+import cn.hutool.json.JSONUtil;
 import me.zhyd.oauth.config.AuthConfig;
 import me.zhyd.oauth.model.AuthCallback;
 import me.zhyd.oauth.model.AuthResponse;
@@ -25,7 +25,6 @@ import org.keycloak.services.ErrorPage;
 import org.keycloak.services.managers.ClientSessionCode;
 import org.keycloak.services.messages.Messages;
 import org.keycloak.sessions.AuthenticationSessionModel;
-import org.keycloak.utils.JsonUtils;
 
 
 import javax.ws.rs.GET;
@@ -74,6 +73,7 @@ public class JustIdentityProvider<T extends AuthDefaultRequest> extends Abstract
 
     @Override
     public Object callback(RealmModel realm, AuthenticationCallback callback, EventBuilder event) {
+        logger.infof("callback: start");
         return new Endpoint(session, callback, event);
     }
 
@@ -107,7 +107,12 @@ public class JustIdentityProvider<T extends AuthDefaultRequest> extends Abstract
         public Response authResponse(@QueryParam("state") String state,
                                      @QueryParam("code") String authorizationCode,
                                      @QueryParam("error") String error) {
-            AuthCallback authCallback = AuthCallback.builder().code(authorizationCode).state(state).build();
+            // logger params
+            logger.infof("authResponse: state=%s,code=%s,error=%s", state, authorizationCode, error);
+            AuthCallback authCallback = AuthCallback.builder()
+                    .code(authorizationCode)
+                    .state(state)
+                    .build();
 
             IdentityBrokerState idpState = IdentityBrokerState.encoded(state, realm);
             String clientId = idpState.getClientId();
@@ -118,26 +123,22 @@ public class JustIdentityProvider<T extends AuthDefaultRequest> extends Abstract
                 sendErrorEvent();
                 return ErrorPage.error(session, null, Response.Status.BAD_REQUEST, Messages.INVALID_REQUEST);
             }
+
             ClientModel client = realm.getClientByClientId(clientId);
 
             AuthenticationSessionModel
                     authSession = ClientSessionCode.getClientSession(state, tabId, session, realm, client, event, AuthenticationSessionModel.class);
 
             // 没有check 不通过
-            String redirectUri = "https://www.yfwj.com";
+            String redirectUri = "https://io.github.yanfeiwuji";
             AuthRequest authRequest = getAuthRequest(AUTH_CONFIG, redirectUri);
-            authRequest.authorize(state);
             AuthResponse<AuthUser> response = authRequest.login(authCallback);
-
-            logger.infof("response: %s", JSONObject.toJSONString(response));
             if (response.ok()) {
-
-
                 AuthUser authUser = response.getData();
                 JustIdentityProviderConfig config = JustIdentityProvider.this.getConfig();
                 BrokeredIdentityContext federatedIdentity = new BrokeredIdentityContext(authUser.getUuid());
                 authUser.getRawUserInfo().forEach((k, v) -> {
-                    String value = (v instanceof String) ? v.toString() : JSONObject.toJSONString(v);
+                    String value = (v instanceof String) ? v.toString() : JSONUtil.toJsonStr(v);
                     // v  不能过长
                     federatedIdentity.setUserAttribute(config.getAlias() + "-" + k, value);
                 });
@@ -154,10 +155,9 @@ public class JustIdentityProvider<T extends AuthDefaultRequest> extends Abstract
                 federatedIdentity.setBrokerUserId(authUser.getUuid());
                 federatedIdentity.setIdpConfig(config);
                 federatedIdentity.setIdp(JustIdentityProvider.this);
-                logger.infof("response ok mark: %s", JSONObject.toJSONString(federatedIdentity));
+                federatedIdentity.setAuthenticationSession(authSession);
                 return this.callback.authenticated(federatedIdentity);
             } else {
-                logger.errorf("Failed to make identity provider oauth callback: %s", response.getMsg());
                 sendErrorEvent();
                 return ErrorPage.error(session, authSession, Response.Status.BAD_GATEWAY, Messages.UNEXPECTED_ERROR_HANDLING_RESPONSE);
             }
